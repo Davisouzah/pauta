@@ -1,0 +1,1 @@
+# Sem reflexão no app. Regras de consumo do Compose/AndroidX já vêm nas bibliotecas.

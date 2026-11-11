@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Pauta</string>
+  <color name="paper">#FAF8F2</color>
+  <color name="ink_blue">#243B53</color>
+</resources>
