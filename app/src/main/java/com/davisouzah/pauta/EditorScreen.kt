@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -275,7 +274,7 @@ fun EditorScreen(vm: NotesViewModel, noteId: String) {
               .weight(1f)
               .focusRequester(bodyFocus),
             decorationBox = { inner ->
-              Box {
+              Box(Modifier.fillMaxSize()) {
                 if (body.text.isEmpty()) {
                   Text(
                     "Comece a escrever…",

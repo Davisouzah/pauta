@@ -7,12 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
+import java.util.concurrent.Executors
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 enum class SortMode { EDITED, CREATED, TITLE }
@@ -31,6 +30,7 @@ sealed interface Screen {
 class NotesViewModel(app: Application) : AndroidViewModel(app) {
   private val store = NoteStore(app)
   private val prefs = app.getSharedPreferences("pauta_prefs", Context.MODE_PRIVATE)
+  private val saveExecutor = Executors.newSingleThreadExecutor()
   private var saveJob: Job? = null
   private var generation = 0
 
@@ -211,11 +211,13 @@ class NotesViewModel(app: Application) : AndroidViewModel(app) {
     generation++
     saveJob?.cancel()
     saving = false
-    store.save(notes)
+    val snapshot = notes
+    saveExecutor.execute { store.save(snapshot) }
   }
 
   override fun onCleared() {
     flush()
+    saveExecutor.shutdown()
     super.onCleared()
   }
 
@@ -226,7 +228,7 @@ class NotesViewModel(app: Application) : AndroidViewModel(app) {
     saveJob?.cancel()
     saveJob = viewModelScope.launch {
       delay(400)
-      withContext(Dispatchers.IO) {
+      saveExecutor.execute {
         if (current == generation) store.save(snapshot)
       }
       saving = false
@@ -250,7 +252,7 @@ class NotesViewModel(app: Application) : AndroidViewModel(app) {
         Seu caderno leve, rápido e 100% offline.
 
         - [ ] Fixe o que importa com a estrela
-        - [ ] Organize com #tags
+        - [ ] Organize com tags: #importante
         - [ ] Toque em Visualizar para ler o Markdown
 
         ## Markdown sem complicação
